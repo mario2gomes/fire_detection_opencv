@@ -8,15 +8,15 @@ Created on Mon Apr 30 18:37:19 2018
 #no posicionameto físico de um pixel a ordem é: x,y, na localização do pixel na matriz linha x coluna é y,x
 import cv2
 #captura.release()
-#captura = cv2.VideoCapture(0)
+captura = cv2.VideoCapture(0)
 
-imagem = cv2.imread('imagens/babuino.jpg')
+#imagem = cv2.imread('imagens/babuino.jpg')
 
 while True:
-#    ret,frame = captura.read()
-#    frame = cv2.flip(frame,1)
+    ret,frame = captura.read()
+    frame = cv2.flip(frame,1)
     
-    frame = imagem
+ #   frame = imagem
     
     x_centro = int(frame.shape[1]/2)    #x central
     y_centro = int(frame.shape[0]/2)    #y central
