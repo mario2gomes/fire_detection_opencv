@@ -6,7 +6,6 @@ Created on Tue May  8 16:39:56 2018
 """
 import time
 import winsound as som
-import numpy as np
 import pandas as pd
 import cv2
 #captura.release()
@@ -15,7 +14,7 @@ captura = cv2.VideoCapture(0)
 
 #imagem = cv2.imread('imagens/luzes.jpg')
 inicio = 0
-
+fogo =0
 areas0 = pd.DataFrame(columns=['contorno','area','x','y'])
 areas1 = pd.DataFrame(columns=['contorno','area','x','y'])
 area_comparacao = pd.DataFrame(columns=['contorno','area','x','y'])
@@ -23,18 +22,16 @@ area_comparacao = pd.DataFrame(columns=['contorno','area','x','y'])
 while True:
 
     areas0 = areas0.drop(areas0.index)
+    area_comparacao = area_comparacao.drop(area_comparacao.index)
 
-    ret,frame = captura.read()
-    frame = cv2.flip(frame,1)
+    ret,clip = captura.read()
+    clip = cv2.flip(clip,1)
     
-    #frame = cv2.pyrDown(imagem)
-    gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)    
+    #clip = cv2.pyrDown(imagem)
+    gray = cv2.cvtColor(clip,cv2.COLOR_BGR2GRAY)    
         
     ret,binaria = cv2.threshold(gray, 240, 255, cv2.THRESH_BINARY)
     bordas = cv2.Canny(binaria,20, 170)    
-    
-    cv2.imshow('original',bordas)
-
 
     contornos, hierarquia = cv2.findContours(bordas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     contornos = sorted(contornos, key=cv2.contourArea, reverse=True)
@@ -53,8 +50,8 @@ while True:
                 x,y = int(M['m10']/M['m00'])	, int(M['m01']/M['m00']) #cordenada x do centroide e cordenada y do centroide
 
                 #desenha um círculo e um quadrado no centro do contorno
-                cv2.circle(frame,(x,y),2,(0,255,255),espessura)
-                cv2.rectangle(frame,(x-10,y-10),(x+10,y+10),(0,0,255),espessura)
+                cv2.circle(binaria,(x,y),2,(0,255,255),espessura)
+                cv2.rectangle(binaria,(x-10,y-10),(x+10,y+10),(0,0,255),espessura)
 
                 #area do contorno
                 area = cv2.contourArea(contornos[i])
@@ -101,20 +98,22 @@ while True:
             
             if (area_comparacao['area'][i]>10):
                 print ('9 - iferenca maior que 10')
+                
+                fogo = fogo+1
+                
                 M = cv2.moments(area_comparacao['contorno'][i])
                 x,y = int(M['m10']/M['m00'])	, int(M['m01']/M['m00']) #cordenadas x e y do centroide
     
                 #desenha um círculo e um quadrado no centro do contorno
-                cv2.circle(frame,(x,y),2,(255,255,0),espessura+2)
-                cv2.rectangle(frame,(x-10,y-10),(x+10,y+10),(255,0,255),espessura+2)
-                cv2.putText(frame,'fogo',(x-400,y-100),cv2.FONT_HERSHEY_COMPLEX,tamanhoFonte,(0,255,255),espessura)
+                cv2.circle(binaria,(x,y),2,(255,255,0),espessura+2)
+                cv2.rectangle(binaria,(x-10,y-10),(x+10,y+10),(255,0,255),espessura+2)
+                cv2.putText(binaria,'fogo',(x-400,y-100),cv2.FONT_HERSHEY_COMPLEX,tamanhoFonte,(0,255,255),espessura)
                 som.Beep(1000,10000)
 
     #print ('area0: ',areas0)
     #print ('area1: ',areas1)
     #Cópia de areas0 pra comparar as áreas e os centroides em momentos diferentes
     areas1 = areas0.copy()
-    #time.sleep(1000)
 
 #FAZER AQUI COMPARAÇÃO ENTRE AS ÁREAS
                 #ESCOLHER ENTRE AS OPÇÕES:
@@ -122,11 +121,13 @@ while True:
                     #COMPARAR OS CENTROS CONTORNO A CONTORNO E QUANDO DER MATCH COMPARAR AS ÁREAS (USANDO UM FOR)
                     #ORDENAR OS CONTORNOS DE ACORDO COM A POSIÇÃO DO CENTROIDE E COMPARAR OS DE ACORDO COM A ORDEM
     
-    
+    cv2.imshow('original',binaria)
+    #time.sleep(5)
+
 #para de filmar ao pressionar a tecla "enter"
     if cv2.waitKey(1) == 13:
-        cv2.imwrite('frame final bordas.jpg',bordas)
-        cv2.imwrite('frame final.jpg',frame)
+        cv2.imwrite('clip final bordas.jpg',bordas)
+        cv2.imwrite('clip final.jpg',clip)
         break
     
 captura.release()
@@ -141,8 +142,8 @@ if (len(areas0) > 0):
    if ((areas1[i]-areas0[i])>100):
        print ('area: ',area)
        
-       cv2.circle(frame,(x,y),2,(0,255,255),espessura+1)
-       cv2.rectangle(frame,(x-10,y-10),(x+10,y+10),(0,0,255),espessura+1)
-       cv2.putText(frame,'FOGO',(x,y),cv2.FONT_HERSHEY_COMPLEX,tamanhoFonte,(0,255,255),espessura)'''
+       cv2.circle(clip,(x,y),2,(0,255,255),espessura+1)
+       cv2.rectangle(clip,(x-10,y-10),(x+10,y+10),(0,0,255),espessura+1)
+       cv2.putText(clip,'FOGO',(x,y),cv2.FONT_HERSHEY_COMPLEX,tamanhoFonte,(0,255,255),espessura)'''
 #cv2.imshow('imagem binaria: ', binaria)
 #cv2.imshow('bordas: ', bordas)
