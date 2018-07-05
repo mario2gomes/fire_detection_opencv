@@ -10,7 +10,7 @@ import pandas as pd
 import cv2
 #captura.release()
 
-captura = cv2.VideoCapture(0)
+captura = cv2.VideoCapture('videos/fogo.avi')
 
 #imagem = cv2.imread('imagens/luzes.jpg')
 inicio = 0
@@ -103,13 +103,15 @@ while True:
                 
                 M = cv2.moments(area_comparacao['contorno'][i])
                 x,y = int(M['m10']/M['m00'])	, int(M['m01']/M['m00']) #cordenadas x e y do centroide
-    
-                #desenha um círculo e um quadrado no centro do contorno
-                cv2.circle(binaria,(x,y),2,(255,255,0),espessura+2)
-                cv2.rectangle(binaria,(x-10,y-10),(x+10,y+10),(255,0,255),espessura+2)
-                cv2.putText(binaria,'fogo',(x-400,y-100),cv2.FONT_HERSHEY_COMPLEX,tamanhoFonte,(0,255,255),espessura)
-                som.Beep(1000,10000)
+                    
+                #som.Beep(1000,10000)
 
+    if fogo>0:
+        #desenha um círculo e um quadrado no centro do contorno
+        cv2.circle(clip,(x,y),2,(255,255,0),espessura+2)
+        cv2.rectangle(clip,(x-10,y-10),(x+10,y+10),(255,0,255),espessura+2)
+        cv2.putText(clip,'fogo',(x-40,y-10),cv2.FONT_HERSHEY_COMPLEX,tamanhoFonte,(255,255,255),3)
+        
     #print ('area0: ',areas0)
     #print ('area1: ',areas1)
     #Cópia de areas0 pra comparar as áreas e os centroides em momentos diferentes
@@ -121,7 +123,7 @@ while True:
                     #COMPARAR OS CENTROS CONTORNO A CONTORNO E QUANDO DER MATCH COMPARAR AS ÁREAS (USANDO UM FOR)
                     #ORDENAR OS CONTORNOS DE ACORDO COM A POSIÇÃO DO CENTROIDE E COMPARAR OS DE ACORDO COM A ORDEM
     
-    cv2.imshow('original',binaria)
+    cv2.imshow('original',clip)
     #time.sleep(5)
 
 #para de filmar ao pressionar a tecla "enter"
